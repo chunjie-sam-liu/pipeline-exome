@@ -1,0 +1,84 @@
+Name: ngsCAT
+Version: v0.1
+Summary: ngsCAT
+Home-page with examples and detailed installation instructions: http://www.bioinfomgp.org/ngscat
+Author: Francisco J.López-Domingo, Javier P.Florido, Antonio Rueda, Joaquín Dopazo and Javier Santoyo-López
+Institution: Genomics and Bioinformatics Platform of Andalusia (GBPA), Seville, Spain (www.gbpa.es)
+Author-email: javier.santoyo@juntadeandalucia.es.
+Support: bioinformatica@bioinfomgp.org
+License: ngsCAT is made available for non commercial research purposes only under the GNU General Public License. However, notwithstanding any provision of the GNU General Public License, ngsCAT software may not be used for commercial purposes without explicit written permission after contacting
+Description: 
+        
+        ngsCAT
+        *****
+        
+System Requirements
+===================
+Operating system: Linux-based OS
+Computer processor: multi-core processor
+Computer memory: 4GB or more
+
+
+Installation
+============
+
+Users may choose between either a manual installation or an automatic installation.
+
+---------------------
+Manual installation
+---------------------
+ngsCAT can be downloaded from here: http://docs.bioinfomgp.org/_media/ngscat:download:ngscat.v0.1.tar.gz
+Through a linux console, move to the directory where ngsCAT has been downloaded and extract it to the desired directory:
+
+> tar -xzvf ngscat.v0.1.tar.gz [-C /target/directory]
+
+If desired, add ngsCAT to linux PATH and allow execution grants by means of the following commands:
+
+> PATH=${PATH}:[/target/directory/]ngscat.v0.1/  >> ~/.bashrc
+> export PATH  >> ~/.bashrc
+> chmod +x [/target/directory/]ngscat.v0.1/ngscat.py
+
+With regard to ngsCAT dependencies, samtools, numpy, scipy, xlwt and matplotlib can be installed from the software repositories provided by the corresponding O.S. distribution. For example, for a Debian/Ubuntu-based linux distribution, type on the terminal:
+
+> apt-get install [python2.7] samtools python-numpy python-xlwt python-scipy python-matplotlib
+
+For a Fedora-based Linux distribution, type:
+
+> yum install samtools numpy scipy python-xlwt python-matplotlib python-matplotlib-qt4
+
+Pysam 0.7.5 can be downloaded from the pysam project home. Once it has been dowloaded, type on the terminal:
+
+> tar -xzvf pysam-0.7.5.tar.gz
+
+Build and install pysam 0.7.5:
+
+>cd pysam-0.7.5
+>python setup.py build
+>python setup.py install
+
+----------------------
+Automatic installation
+----------------------
+With the aim of making the installation of ngsCAT and its dependencies easier, we provide in the downloads section scripts that automatically download and install ngsCAT source code and its dependencies for different Linux-based distributions:
+
+         - For Ubuntu-based linux distribution: setup_ubuntu.sh (it has been tested in Linux Mint 12, 13 and 15 and Ubuntu 12.04 and 13.10).
+         - For Debian-based linux distribution: setup_debian.sh (it has been tested in Debian 7).
+         - For Fedora-based linux distribution: setup_fedora.sh (it has been tested in Fedora 20).
+
+To run such script, type on the terminal:
+
+sudo -E ./setup_<your_distribution>.sh <targetAbsolutePath>
+where <your_distribution> is either ubuntu, debian or fedora and <targetAbsolutePath> is the absolute path of the directory where ngsCAT will be downloaded. For example:
+
+sudo -E ./setup_ubuntu.sh /home/user/ngsCAT
+After running this script, ngsCAT source code and its dependencies are automatically downloaded and installed in your computer.
+
+IMPORTANT: If you experience problems with the installation or your distribution is not in the previous list, please, contact us: bioinformatica@bioinfomgp.org
+
+
+Architecture specific options
+=============================
+
+ngsCAT has been tested on various Linux systems (Ubuntu, Fedora and Debian) and works with python 2.6 and 2.7. Greater versions of python have not been tested.
+
+Windows and MAC OS support do not work yet.

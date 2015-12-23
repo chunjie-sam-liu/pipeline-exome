@@ -1,0 +1,30 @@
+				<a name="coveragesaturation">
+				<li>
+					<div class="title">
+						<span>Coverage saturation</span> 
+						<a href="data/values.xls"  style="text-decoration: none">
+							<img class="icon" src="img/xls_icon.png" />
+						</a>
+						<img src="img/<COVERAGESATURATIONSTATUS>.jpg" height=35px />
+					</div>
+					
+					<div class="image">
+						<img src="data/coverage_saturation_10x.png" />
+					</div>
+			
+					<fieldset class="description">
+						<legend class="description">Description</legend>
+						<p>
+							Percentage of target-bases covered at coverage >=10x as a function of the number of mapped reads. Sequencing depth simulations
+							were carried out by randomly selecting <DEPTHLIST> reads from the bam file. For each of these sets of reads, the percentage of target-covered
+							positions was calculated. This graph aims to give an idea on how much one can improve the percentage of target-bases covered by
+							resequencing. 
+						</p>
+						<p>
+							A flat curve on the right part indicates that resequencing will not improve the number of target-bases covered at 10x. A
+							warning is issued if the curve does not tend to saturation on the right side (slope between the two last points > <WARNSATURATION>). If the maximum depth provided as input is greater
+							than the number of reads in the bam file, the last x-value corresponds to the number of reads in the bam file.
+						</p>
+					</fieldset>
+				</li>
+				</a>

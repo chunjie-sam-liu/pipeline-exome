@@ -1,0 +1,2 @@
+Library.TPythia8:                           libEGPythia8.so libEG.so libGraf.so libVMC.so libPhysics.so
+Library.TPythia8Decayer:                    libEGPythia8.so libEG.so libGraf.so libVMC.so libPhysics.so

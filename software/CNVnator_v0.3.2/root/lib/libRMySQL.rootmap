@@ -1,0 +1,4 @@
+Library.TMySQLResult:                       libRMySQL.so libNet.so libRIO.so
+Library.TMySQLRow:                          libRMySQL.so libNet.so libRIO.so
+Library.TMySQLServer:                       libRMySQL.so libNet.so libRIO.so
+Library.TMySQLStatement:                    libRMySQL.so libNet.so libRIO.so

@@ -1,0 +1,3 @@
+#!/bin/sh
+dir=$ROOTSYS/lib
+python ${dir}/python/genreflex/genreflex-rootcint.py "$@"

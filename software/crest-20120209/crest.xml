@@ -1,0 +1,536 @@
+<tool id="crest" name="CREST" version="1.0">
+ <description>Clipping reveals structural variations</description>
+ <requirements>
+  <requirement type="package">bioperl</requirement>
+  <requirement type="binary">gfServer</requirement>
+  <requirement type="binary">gfClient</requirement>
+  <requirement type="binary">cap</requirement>
+ </requirements>
+ <command> mkdir $crest_log.extra_files_path; cat $shscript > $crest_log.extra_files_path/crest.sh; /bin/bash $shscript &#38;> $crest_log</command>
+ <inputs>
+  <param name="tumor_bam" type="data" format="bam" label="Tumor Sample" 
+         help="BAM files must contain soft-clipping signatures at the breakpoints.  If they do not, you will not get any results."/>
+  <param name="germline_bam" type="data" format="bam" optional="true" label="Germline Sample" help=""/>
+  <conditional name="refGenomeSource">
+      <param name="genomeSource" type="select" label="&lt;HR&gt;Will you select a reference genome from your history or use a built-in index" help="">
+        <option value="indexed">Use a built-in index</option>
+        <option value="history">Use one from the history</option>
+      </param>
+      <when value="indexed">
+        <param name="genome_fasta" type="select" label="Select a Reference Dataset" help="if your genome of interest is not listed - contact Galaxy team">
+          <options from_file="crest.loc">
+            <column name="dbkey" index="0"/>
+            <column name="name" index="1"/>
+            <column name="value" index="2"/>
+            <filter type="data_meta" ref="tumor_bam" key="dbkey" column="0" />
+            <validator type="no_options" message="No indexes are available" />
+          </options>
+        </param>
+        <param name="genome_2bit" type="select" optional="true" label="The 2bit index" help="">
+          <options from_file="crest.loc">
+            <column name="dbkey" index="0"/>
+            <column name="name" index="1"/>
+            <column name="value" index="3"/>
+            <filter type="data_meta" ref="tumor_bam" key="dbkey" column="0" />
+          </options>
+        </param>
+      </when>
+      <when value="history">
+        <param name="genome_fasta" type="data" format="fasta" label="Genome Reference Sequence" help="Should match your input Tumor Sample BAM fie database">
+          <validator type="unspecified_build" message="Must assign a build"/>
+        </param>
+        <param name="genome_2bit" type="data" format="twobit" label="Genome Reference 2bit index (Choose same as Genome Reference Sequence)" help="">
+          <validator type="unspecified_build" message="Must assign a build"/>
+        </param>
+      </when>  <!-- history -->
+  </conditional>  <!-- refGenomeSource -->
+  <!-- Input Datasets -->
+  <conditional name="rnaseq">
+   <param name="mode" type="boolean" checked="false" truevalue="yes" falsevalue="no" label="&lt;HR&gt;RNAseq mode" 
+         help="Requires a gene model file"/>
+   <when value="no">
+   </when>
+   <when value="yes">
+    <param name="gene_model" type="data" format="bed" label="Gene model file" help="currently only refFlat format (BED) is supported"/>
+    <param name="cluster_size" type="integer" value="" optional="true" label="Cluster Size" 
+           help="The soft-clipped reads within cluster_size will be considered together, default is 3">
+      <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+   </when>
+  </conditional>
+  <!-- options -->
+  <param name="paired" type="boolean" checked="true" truevalue="" falsevalue="--nopaired" label="&lt;HR&gt;Paired Reads?"/>
+  <param name="read_len" type="integer" value="" optional="true" label="Read length of the sequencing data" 
+           help="The read length of the sequencing data, defaut 100">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+  </param>
+  <param name="sensitive" type="boolean" checked="false" truevalue="--sensitive" falsevalue="" label="&lt;HR&gt;Sensitive" 
+         help="The program will generate more SVs with higher false positive rate."/>
+  <param name="range" type="text" value="" optional="true" label="Limit Genome range where SV will be detected," 
+         help="The range where SV will be detected, using chr1:100-200 format">
+            <validator type="regex" message="format: chr1:100-200">^\w+(:\d+-\d+)?$</validator>
+  </param>
+  <conditional name="hit">
+   <param name="mode" type="select" label="&lt;HR&gt;Adjust Hit Detection">
+    <option value="no">Use defaults</option>
+    <option value="yes">Adjust Settings</option>
+   </param>
+   <when value="yes">
+    <param name="max_score_diff" type="integer" value="" optional="true" label="maximum score difference" 
+           help="The maximum score difference when stopping select hit, default 10.">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_sclip_reads" type="integer" value="" optional="true" label="Minimum number of soft clipping reads" 
+           help="Minimum number of soft clipping read to triger the procedure, default 3 (10 for RNASeq)">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="max_rep_cover" type="integer" value="" optional="true" label="Repetitive coverage threshold" 
+           help="The min number of coverage to be called as repetitive and don't triger the procedure, default 500 (5000 for RNASeq)">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_sclip_len" type="integer" value="" optional="true" label="Soft clipping detection" 
+           help="The min length of soft clipping part at a position to triger the detection, default 20.">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_hit_len" type="integer" value="" optional="true" label="Minimum length of a hit for genome mapping" 
+           help="">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_hit_reads" type="integer" value="" optional="true" label="Minimum read hits" 
+           help="Minimum number of reads in a hit. default 3 (10 for  RNASeq)">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_dist_diff" type="integer" value="" optional="true" label="Min distance between the mapped position and the soft clipping position" 
+           help="Min distance between the mapped position and the soft clipping position, default 20.">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+   </when>
+   <when value="no"/>
+  </conditional>
+  
+  <conditional name="softclip">
+   <param name="mode" type="select" label="&lt;HR&gt;Adjust Soft Clipping">
+    <option value="no">Use defaults</option>
+    <option value="yes">Adjust Settings</option>
+   </param>
+   <when value="yes">
+    <param name="min_percent_id" type="integer" value="" optional="true" label="Identity threshold for soft clipping read mapping" 
+           help="Min percentage of identity of soft clipping read mapping, default 90">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="min_percent_hq" type="integer" value="" optional="true" label="High quality bases threshold for soft clipping" 
+           help="Min percentage of high quality base in soft clipping reads, default 80">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="lowqual_cutoff" type="integer" value="" optional="true" label="Low quality cutoff" 
+           help="Low quality cutoff value, default 20.">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+   </when>
+   <when value="no"/>
+  </conditional>
+
+  <conditional name="sv_filter">
+   <param name="mode" type="select" label="&lt;HR&gt;Adjust Structural Variant Filtering">
+    <option value="no">Use defaults</option>
+    <option value="yes">Adjust Settings</option>
+   </param>
+   <when value="yes">
+    <param name="min_percent_cons_of_read" type="float" value="" optional="true" label="Relative consensus length threshold" 
+           help="Minimum percent of consensus length of read length, default 0.75">
+            <validator type="in_range" message="Must be greater than 0" min="0" max="1"/>
+    </param>
+    <param name="max_bp_dist" type="integer" value="" optional="true" label="Maximum distance between break points" 
+           help="Maximum distance in base pairs between two idenfitifed break points, default 15">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="germline_seq_width" type="integer" value="" optional="true" label="Germline SV filtering window" 
+           help="Half window width of genomic sequence around break point for germline SV filtering, default 100">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="germline_search_width" type="integer" value="" optional="true" label="Soft Clip Germline SV filtering window" 
+           help="Half window width for seaching soft-clipped reads around breakpoint for germline SV iltering, default 50">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+   </when>
+   <when value="no"/>
+  </conditional>
+
+  <conditional name="rescue">
+   <param name="mode" type="select" label="&lt;HR&gt;Rescue mode"
+          help="a SV with only 1 side with enough soft-clipped reads is considered as a valid one, default is ON.">
+    <option value="no">Rescue mode Off</option>
+    <option value="default" selected="true">Rescue On with default Setting</option>
+    <option value="yes">Adjust Rescue Settings</option>
+   </param>
+   <when value="yes">
+    <param name="min_one_side_reads" type="integer" value="" optional="true" label="Minimum number of soft-clipped reads on one side" 
+         help="the minimum number of soft-clipped reads on one side, default 5">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+   </when>
+   <when value="no"/>
+   <when value="default"/>
+  </conditional>
+
+  <conditional name="tandem_repeat">
+   <param name="mode" type="select" label="&lt;HR&gt;Tandem Repeats"
+          help="Remove tandem repeat caused SV events, default is ON.">
+    <option value="default" selected="true">Remove Tandem Repeats using default Setting</option>
+    <option value="yes">Remove Tandem Repeats with Adjusted Settings</option>
+    <option value="no">Keep Tandem Repeats</option>
+   </param>
+   <when value="yes">
+    <param name="tr_max_indel_size" type="integer" value="" optional="true" label="Maximum INDEL events" 
+         help="Maximum tandem repeat mediated INDEL events, default 100">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="tr_min_size" type="integer" value="" optional="true" label="Minimum tandem reapet size" 
+         help="Minimum tandem reapet size, default 2">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="tr_max_size" type="integer" value="" optional="true" label="Maximum tandem reapet size" 
+         help="Maximum tandem reapet size, default 8">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="tr_min_num" type="integer" value="" optional="true" label="Minimum tandem reapet number" 
+         help="Minimum tandem repeat number, defaut 4">
+            <validator type="in_range" message="Must be greater than 0" min="1"/>
+    </param>
+    <param name="hetero_factor" type="float" value="" optional="true" label="heterogenirity and heterozygosity factor" 
+           help="The factor about the SV's heterogenirity and heterozygosity, default 0.4">
+            <validator type="in_range" message="Must be greater than 0" min="0" max="1"/>
+    </param>
+    <param name="triger_p_value" type="float" value="" optional="true" label="heterogenirity and heterozygosity factor" 
+           help="The p-value that will triger the SV detection when number of soft-clipped reads is small, default 0.05">
+            <validator type="in_range" message="Must be greater than 0" min="0" max="1"/>
+    </param>
+   </when>
+   <when value="default"/>
+   <when value="no"/>
+  </conditional>
+ </inputs>
+ <outputs>
+  <data format="txt" name="crest_log" label="${tool.name} on ${on_string}: crest.log" />
+  <data format="tabular" name="tumor_cover" label="${tool.name} on ${on_string}: tumor.cover" from_work_dir="tumor.bam.cover"/>
+  <data format="tabular" name="tumor_sclip" label="${tool.name} on ${on_string}: tumor.sclip.txt" from_work_dir="tumor.bam.sclip.txt"/>
+  <data format="tabular" name="germline_cover" label="${tool.name} on ${on_string}: germline.cover" from_work_dir="germline.bam.cover">
+    <filter>germline_bam != None</filter>
+  </data>
+  <data format="tabular" name="germline_sclip" label="${tool.name} on ${on_string}: germline.sclip.txt" from_work_dir="germline.bam.sclip.txt">
+    <filter>germline_bam != None</filter>
+  </data>
+  <data format="tabular" name="predSV" label="${tool.name} on ${on_string}: tumor.predSV.txt" from_work_dir="tumor.bam.predSV.txt"/>
+  <data format="html" name="predSV_html" label="${tool.name} on ${on_string}: tumor.bam.predSV.html" />
+ </outputs>
+ <configfiles>
+  <configfile name="shscript"> #slurp
+#!/bin/bash
+## define some things for cheetah proccessing and to avoid problems with xml parsing of this tool_config
+#set $amp = chr(38)
+#set $ds = chr(36)
+#set $gt = chr(62)
+#set $lt = chr(60)
+#set $echo_cmd = 'echo'
+## Find the CREST.pl in the galaxy tool path
+#import Cheetah.FileUtils
+#set $toolpath = '/'.join([$__root_dir__,'tools','crest'])
+#set $crest = $Cheetah.FileUtils.findFiles($toolpath,['CREST.pl'],[],['example','Tree'])[0]
+#set $extractSClip = $Cheetah.FileUtils.findFiles($toolpath,['extractSClip.pl'],[],['example','Tree'])[0]
+#set $countDiff = $Cheetah.FileUtils.findFiles($toolpath,['countDiff.pl'],[],['example','Tree'])[0]
+#set $bam2html = $Cheetah.FileUtils.findFiles($toolpath,['bam2html.pl'],[],['example','Tree'])[0]
+## 
+## Need ptrfinder on path
+export PATH=${ds}PATH:$toolpath
+#raw
+## Set temp directory
+export TMPDIR=`pwd`/tmp
+mkdir -p $TMPDIR
+#end raw
+## check for the genome reference 2bit 
+if  [ ! -f $refGenomeSource.genome_2bit ]; then exit 1; fi
+## get the dbkey and use that in link name
+#set $dbkey = $tumor_bam.metadata.dbkey
+#set $ref_fa = '.'.join([$dbkey,'fa'])
+#set $ref_2bit = '.'.join([$dbkey,'2bit'])
+ref_fa=$ref_fa
+ref_2bit=$ref_2bit
+ln -s $refGenomeSource.genome_fasta $ref_fa
+ln -s $refGenomeSource.genome_2bit $ref_2bit
+target_genome=`pwd`/$ref_2bit
+## Problem - gfServer doesn't reserve the port until it's done reading genome, so another might try to open the same port
+#raw
+## start a local gfServer with the selected genome reference
+## find an open port on which to start a blat server via gfServer 
+for (( bp = 50000 + $$ % 1000; bp &lt; 60000; bp += 7 ))
+do
+   if ! netstat -an | grep $bp > /dev/null; then blatport=$bp; break; fi
+done
+## exit if can't open a port
+echo "Starting gfServer on port " $blatport
+#end raw
+( gfServer -canStop -log=gfServer.log start localhost ${ds}blatport ${ds}target_genome 2${gt} /dev/null ) ${amp}
+#raw
+(
+## symbolic link the tumor input bam annd bai files in our working directory
+#end raw
+ln -s $tumor_bam tumor.bam
+ln -s $tumor_bam.metadata.bam_index tumor.bam.bai
+## String value of an Optional DataToolParameter input is 'None' when not set
+#if $germline_bam.__str__ != 'None':
+#raw
+## symbolic link the germline input bam annd bai files in our working directory
+#end raw
+ln -s $germline_bam germline.bam
+ln -s $germline_bam.metadata.bam_index germline.bam.bai
+#end if
+#raw
+## Get soft-clipping positions.
+#end raw
+$echo_cmd perl -I $toolpath $extractSClip -i tumor.bam --ref_genome $ref_fa
+perl -I $toolpath $extractSClip -i tumor.bam --ref_genome $ref_fa
+##
+## If there is a germline input
+#if $germline_bam.__str__ != 'None':
+$echo_cmd perl -I $toolpath $extractSClip -i tumor.bam --ref_genome $ref_fa
+perl -I $toolpath $extractSClip -i tumor.bam --ref_genome $ref_fa
+#raw
+## Remove germline events (optional)
+#end raw
+$echo_cmd perl -I $toolpath  $countDiff -d tumor.bam.cover -g germline.bam.cover to  soft_clip.dist.txt
+perl -I $toolpath  $countDiff -d tumor.bam.cover -g germline.bam.cover $gt soft_clip.dist.txt
+#end if
+)
+## Running the SV detection script.
+## Determine the CREST options
+#set $crest_args = ["-f tumor.bam.cover -d tumor.bam"]
+##
+#if $germline_bam.__str__ != 'None':
+#set $crest_args = $crest_args + ["-g germline.bam"]
+#end if
+#set $crest_args = $crest_args + ["--ref_genome",$ref_fa]
+##
+#if $rnaseq.mode
+ #set $crest_args = $crest_args + ["--RNASeq","--genemodel",$rnaseq.gene_model.__str__]
+ #if $rnaseq.cluster_size.__str__ != '':
+  #set $crest_args = $crest_args + ["--cluster_size",$rnaseq.cluster_size.__str__]
+ #end if
+#end if
+##
+#if $paired.__str__ != '':
+ #set $crest_args = $crest_args + [$paired.__str__]
+#end if
+#if $sensitive.__str__ != '':
+ #set $crest_args = $crest_args + [$sensitive.__str__]
+#end if
+#if $range.__str__ != '':
+ #set $crest_args = $crest_args + ["-r",$range.__str__]
+#end if
+#if $read_len.__str__ != '':
+ #set $crest_args = $crest_args + ["-l",$read_len.__str__]
+#end if
+##
+#if $hit.mode.__str__ == 'yes':
+ #if $hit.max_score_diff.__str__ != '':
+  #set $crest_args = $crest_args + ["--max_score_diff", $hit.max_score_diff.__str__]
+ #end if
+ #if $hit.min_sclip_reads.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_sclip_reads",$hit.min_sclip_reads.__str__]
+ #end if
+ #if $hit.max_rep_cover.__str__ != '':
+  #set $crest_args = $crest_args + ["--max_rep_cover",$hit.max_rep_cover.__str__]
+ #end if
+ #if $hit.min_sclip_len.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_sclip_len",$hit.min_sclip_len.__str__]
+ #end if
+ #if $hit.min_hit_len.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_hit_len",$hit.min_hit_len.__str__]
+ #end if
+ #if $hit.min_hit_reads.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_hit_reads",$hit.min_hit_reads.__str__]
+ #end if
+ #if $hit.min_dist_diff.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_dist_diff",$hit.min_dist_diff.__str__]
+ #end if
+#end if
+##
+#if $softclip.mode.__str__ == 'yes':
+ #if $softclip.min_percent_id.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_percent_id",$softclip.min_percent_id.__str__]
+ #end if
+ #if $softclip.min_percent_hq.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_percent_hq",$softclip.min_percent_hq.__str__]
+ #end if
+ #if $softclip.lowqual_cutoff.__str__ != '':
+  #set $crest_args = $crest_args + ["--lowqual_cutoff",$softclip.lowqual_cutoff.__str__]
+ #end if
+#end if
+##
+#if $sv_filter.mode.__str__ == 'yes':
+ #if $sv_filter.min_percent_cons_of_read.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_percent_cons_of_read",$sv_filter.min_percent_cons_of_read.__str__]
+ #end if
+ #if $sv_filter.max_bp_dist.__str__ != '':
+  #set $crest_args = $crest_args + ["--max_bp_dist",$sv_filter.max_bp_dist.__str__]
+ #end if
+ #if $sv_filter.germline_seq_width.__str__ != '':
+  #set $crest_args = $crest_args + ["--germline_seq_width",$sv_filter.germline_seq_width.__str__]
+ #end if
+ #if $sv_filter.germline_search_width.__str__ != '':
+  #set $crest_args = $crest_args + ["--germline_search_width",$sv_filter.germline_search_width.__str__]
+ #end if
+#end if
+##
+#if $rescue.mode.__str__ == 'yes':
+ #if $rescue.min_one_side_reads.__str__ != '':
+  #set $crest_args = $crest_args + ["--min_one_side_reads",$rescue.min_one_side_reads.__str__]
+ #end if
+#elif $rescue.mode.__str__ == 'no':
+  #set $crest_args = $crest_args + ["--norescue"]
+#end if
+##
+#if $tandem_repeat.mode.__str__ == 'yes':
+ #if $tandem_repeat.tr_max_indel_size.__str__ != '':
+  #set $crest_args = $crest_args + ["--tr_max_indel_size",$tandem_repeat.tr_max_indel_size.__str__]
+ #end if
+ #if $tandem_repeat.tr_min_size.__str__ != '':
+  #set $crest_args = $crest_args + ["--tr_min_size",$tandem_repeat.tr_min_size.__str__]
+ #end if
+ #if $tandem_repeat.tr_max_size.__str__ != '':
+  #set $crest_args = $crest_args + ["--tr_max_size",$tandem_repeat.tr_max_size.__str__]
+ #end if
+ #if $tandem_repeat.tr_min_num.__str__ != '':
+  #set $crest_args = $crest_args + ["--tr_min_num",$tandem_repeat.tr_min_num.__str__]
+ #end if
+ #if $tandem_repeat.hetero_factor.__str__ != '':
+  #set $crest_args = $crest_args + ["--hetero_factor",$tandem_repeat.hetero_factor.__str__]
+ #end if
+ #if $tandem_repeat.triger_p_value.__str__ != '':
+  #set $crest_args = $crest_args + ["--triger_p_value",$tandem_repeat.triger_p_value.__str__]
+ #end if
+#elif $tandem_repeat.mode.__str__ == 'no':
+  #set $crest_args = $crest_args + ["--norm_tandem_repeat"]
+#end if
+#raw
+## check if gfServer is ready
+echo "Waiting for gfServer"
+for (( tries = 0; tries &lt; 30; tries += 1 ))
+do
+  if ! netstat -an | grep $blatport > /dev/null &#38;&#38; ps -f | grep gfServer | grep $blatport > /dev/null; then sleep 60; else break; fi
+done
+#end raw
+#raw
+## Run CREST 
+#end raw
+(
+## perl -I ~/src/crest ../CREST.pl -f tumor.bam.cover -d tumor.bam -g germline.bam --ref_genome hg18.fa --2bitdir=/home/msi/jj/src/crest/example --target_genome=hg18.2bit --blatserver localhost --blatport 50000
+$echo_cmd perl -I $toolpath $crest #echo ' '.join($crest_args)# --target_genome ${ds}target_genome --blatserver localhost --blatport ${ds}blatport 
+perl -I $toolpath $crest #echo ' '.join($crest_args)# --target_genome ${ds}target_genome --blatserver localhost --blatport ${ds}blatport
+#raw
+## Visulization of the detailed alignment at breakpoint (optional)
+## The bam2html.pl script builds an html view of the multiple alignment for the breakpoint, so you can manually check the soft-clipping and other things.
+#end raw
+## bam2html.pl -r hg18.fa -d tumor.bam -g germline.bam -o predSV.html -f predSV.txt
+if [ -e tumor.bam.predSV.txt ]
+then
+#if $germline_bam.__str__ != 'None':
+perl -I $toolpath $bam2html -d tumor.bam -g germline.bam -f tumor.bam.predSV.txt --ref_genome $ref_fa -o $predSV_html
+#else
+perl -I $toolpath $bam2html -d tumor.bam -f tumor.bam.predSV.txt --ref_genome $ref_fa -o $predSV_html
+#end if
+fi
+)
+#raw
+## shut down the blat server
+echo "shutting down gfServer on port " $blatport
+gfServer stop localhost $blatport
+#end raw
+  </configfile>
+ </configfiles>
+ <tests>
+ </tests>
+ <help>
+**CREST**
+
+CREST_ is an algorithm for detecting genomic structural variations at base-pair resolution using next-generation sequencing data.  '
+
+CREST uses pieces of DNA called soft clips to find structural variations.  Soft clips are the DNA segments produced during sequencing that fail to properly align to the reference genome as the sample genome is reassembled.  CREST uses the soft clips to precisely identify sites of chromosomal rearrangement or where pieces of DNA are inserted or deleted.
+
+Please cite the following article:
+
+Wang J, Mullighan CG, Easton J, Roberts S, Heatley SL, Ma J, Rusch MC, Chen K, Harris CC, Ding L, Holmfeldt L, Payne-Turner D, Fan X, Wei L, Zhao D, Obenauer JC, Naeve C, Mardis ER, Wilson RK, Downing JR and Zhang J. CREST maps somatic structural variation in cancer genomes with base-pair resolution (2011). Nature_Methods_.
+
+.. _Nature_Methods: http://www.nature.com/nmeth/journal/v8/n8/pdf/nmeth.1628.pdf
+.. _CREST: http://www.stjuderesearch.org/site/lab/zhang
+
+
+----
+
+**Input formats**
+
+BAM files that must contain soft-clipping signatures at the breakpoints.  If
+they do not, you will not get any results.  
+
+CREST uses soft-clipping signatures to identify breakpoints.  Soft-clipping is
+indicated by "S" elements in the CIGAR for SAM/BAM records.  Soft-clipping may
+not occur, depending on the mapping algorithm and parameters and sometimes even
+the library preparation.
+
+With bwa sampe:
+
+One mapping method that will soft-clip reads is bwa sampe (BWA for paired-end
+reads).  When BWA successfully maps one read in a pair but is not able to map
+the other, it will attempt a more permissive Smith-Waterman alignment of the
+unmapped read in the neighborhood of the mapped mate.  If it is only able to
+align part of the read, then it will soft-clip the portion on the end that it
+could not align.  Often this occurs at the breakpoints of structural
+variations.
+
+In some cases when the insert sizes approach the read length, BWA will not
+perform Smith-Waterman alignment.  Reads from inserts smaller than the read
+length will contain primer and/or adapter and will often not map.  When the
+insert size is close to the read length, this creates a skewed distribution
+of inferred insert sizes which may cause BWA to not attempt Smith-Waterman
+realignment.  This is indicated by the error message "weird pairing".  Often
+in these cases there are also unusually low mapping rates.
+
+One way to fix this problem is to remap unmapped reads bwasw.  To do this,
+extract the unmapped reads as FASTQ files (this may be done with a combination
+of samtools view -f 4 and Picard's SamToFastq).  Realign using bwa bwasw and
+build a BAM file.  Then, re-run CREST on this new BAM file, and you may pick
+up events that would have been missed otherwise.
+
+
+
+
+------
+
+**Outputs**
+
+The output
+file *.predSV.txt has the following tab-delimited columns: left_chr, left_pos,
+left_strand, # of left soft-clipped reads, right_chr, right_pos, right_strand,
+# right soft-clipped reads, SV type, coverage at left_pos, coverage at
+right_pos, assembled length at left_pos, assembled length at right_pos,
+average percent identity at left_pos, percent of non-unique mapping reads at
+left_pos, average percent identity at right_pos, percent of non-unique mapping
+reads at right_pos, start position of consensus mapping to genome,
+starting chromosome of consensus mapping, position of the genomic mapping of
+consensus starting position, end position of consensus mapping to genome,
+ending chromsome of consnesus mapping, position of genomic mapping of
+consensus ending posiiton, and consensus sequences.  For inversion(INV), the
+last 7 fields will be repeated to reflect the fact two different breakpoints
+are needed to identify an INV event.
+
+Example of the tumor.predSV.txt file:
+
+4       125893227       +       5       10      66301858        -       4       CTX     29      14      83      71      0.895173453996983       0.230769230769231       0.735384615384615       0.5     1       4       125893135       176     10      66301773        TTATGAATTTTGAAATATATATCATATTTTGAAATATATATCATATTCTAAATTATGAAAAGAGAATATGATTCTCTTTTCAGTAGCTGTCACCTCCTGGGTTCAAGTGATTCTCCTGCCTCTACCTCCCGAGTAGCTGGGATTACAGGTGCCCACCACCATGCCTGGCTAATTTT
+5       7052198 -       0       10      66301865        +       8       CTX     0       22      0       81      0.761379310344828       0.482758620689655       0       0       1       5       7052278 164     10      66301947        AGCCATGGACCTTGTGGTGGGTTCTTAACAATGGTGAGTCCGGAGTTCTTAACGATGGTGAGTCCGTAGTTTGTTCCTTCAGGAGTGAGCCAAGATCATGCCACTGCACTCTAGCCTGGGCAACAGAGGAAGACTCCACCTCAAAAAAAAAAAGTGGGAAGAGG
+10      66301858        +       4       4       125893225       -       1       CTX     15      28      71      81      0.735384615384615       0.5     0.889507154213037       0.243243243243243       1       10      66301777        153     4       125893154       TTAGCCAGGCATGGTGGTGGGCACCTGTAATCCCAGCTACTCGGGAGGTAGAGGCAGGAGAATCACTTGAACCCAGGAGGTGACAGCTACTGAAAAGAGAATCATATTCTCTTTTCATAATTTAGAATATGATATATATTTCAAAATATGATA
+
+If there are no or very few results, there may be a lack of soft-clipping. 
+
+
+
+ </help>
+</tool>

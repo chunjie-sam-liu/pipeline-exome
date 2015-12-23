@@ -1,0 +1,384 @@
+@CHARSET "UTF-8";
+
+.clearfix:after{
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+.clearfix {display: inline;}
+
+/* HACK: Esconder de IE/Mac */
+* html .clearfix {height: 1%}
+.clearfix {display: block;}
+/* FIN-HACK: Esconder de IE/Mac */
+
+
+/* ------------------------------------------------------------------
+   ---------------------------- Wrapper ----------------------------- 
+   ------------------------------------------------------------------ */
+body{
+	font: 12px/170% Georgia, Arial,sans-serif;
+	margin: 0 auto;
+}
+
+head{
+}
+
+img{
+	border: none;
+}
+
+/* ------------------------------------------------------------------------------
+   ----------------------------------  HEADER SECTION ---------------------------
+   ------------------------------------------------------------------------------ */
+#header-section{
+    margin: 0 auto;
+    max-width: 1152px;
+    min-width: 950px;
+    width: 80%;
+    height: 175px;
+}
+
+
+/* ------------------------------------------------------------------------------
+   -----------------------------------  MENU SECTION ----------------------------
+   ------------------------------------------------------------------------------ */
+#menu-section{
+	margin: -2.2em auto 1em auto;
+    max-width: 1152px;
+    min-width: 950px;
+    width: 80%;
+    z-index: 10;
+    display: block;
+}
+
+
+
+/* ------------------------------------------------------------------------------
+   ---------------------------------  CONTENT SECTION ---------------------------
+   ------------------------------------------------------------------------------ */
+#content-section{
+	clear: both;
+	margin: 4em auto 0;
+    width: 80%;
+}
+
+h1{
+	text-align: center;
+	font-size: 40px;
+	font-weight: bold;
+}
+
+legend{
+	font-size: large;
+	text-transform: capitalize;
+	font-weight: bold;
+	margin: 0.2em 0;
+	padding: 0.2em;
+	padding-left: 1em;
+	padding-right: 1em;
+	background-color: #F5DEB3;
+	border: 1px solid #8B4513;
+	text-shadow: 1px 1px 2px #8B4513;
+}
+
+div.result{
+	margin-top: 1.7em;
+}
+
+ul.inputParameters li{
+	margin-top: 0.5em;
+}
+
+ul.inputParameters li label{
+	width: 10%;
+	display: block;
+	float: left;
+}
+
+ul.inputParameters li input{
+	width: 88%;
+}
+
+div.inputParameters  table{
+	float: left;
+	width: 78%;
+	border: 1px solid black;
+}
+
+div.title span{
+	font-size: small;
+	font-weight: bold;
+	font-style: italic;
+	color: #8B4513;
+}
+
+div.title a image.icon{
+	width: 16px;
+	height: 16px;
+}
+
+ul li.header{
+	margin-top: 2.5em;
+}
+
+div.image{
+	text-align: center;
+}
+
+div.image img{
+	width: 90%;
+}
+
+fieldset.description{
+	clear: both;
+	width: 90%;
+	margin: 0 auto;
+	margin-top: 1em;
+	border: 1px solid black;
+}
+
+fieldset.description legend{
+	border-color: black;
+	background-color: #DCDCDC;
+	font-size: small;
+	padding: 0.1em;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+}
+
+fieldset.description p{
+	text-align: justify;
+	text-decoration: none !important;
+	color: black;
+	font-size: small;
+}
+
+/* ------------------------------------------------------------------------------
+   ----------------------------------  FOOT SECTION -----------------------------
+   ------------------------------------------------------------------------------ */
+#foot-section{
+	clear: both;
+	text-align: center;
+	margin: 0 auto;
+    max-width: 1152px;
+    min-width: 950px;
+    width: 80%;
+}
+
+
+/*
+*
+* Table styles
+*
+*/
+
+.table {
+/*  width: 90%;*/
+  border-width: 1px;
+  border-style: solid;
+  border-color: #aaa;
+  border-collapse: collapse;
+  margin-left: 0px;
+}
+
+.table-header {  
+  font-weight: bold;
+  font-size: 8pt;
+  color: #333;
+  background-color: #fff;
+  padding: 5px;
+  border-width: 0px 0px 2px 0px;
+  border-style: solid;
+  border-color: #55f;
+  text-align: center;
+}
+
+.table-rowname {
+  font-weight: bold;
+  font-size: 8pt;
+  color: #333;
+  background-color: #fafafa;
+  padding: 5px;
+  border-width: 0px 1px 1px 0px;
+  border-style: solid dotted solid solid;
+  border-color: #555;
+}
+
+.table-rownumber {
+  font-weight: bold;
+  font-size: 8pt;
+  color: #aaf;
+  background-color: #fff;
+  padding: 5px;
+  border-width: 1px 0px 1px 0px;
+  border-style: solid;
+  border-color: #55fs;
+}
+
+.table-cell {
+  font-size: 8pt;  
+  border-width: 0px 1px 1px 0px;
+  border-style: solid dashed solid solid;
+  border-color: #aaa;
+  padding: 5px;
+  text-align: center;
+}
+
+.table-page {
+  font-weight: bold;
+  font-size: 8pt;
+  color: #888;
+  padding: 5px;
+}
+
+.table-container{
+  margin-left: 5px;	
+}
+	
+.id-cell{
+  width: 70px
+  white-space: nowrap;
+}
+
+.mini-table{
+  font-size: 8pt;  
+  border-collapse: collapse;
+}
+
+.mini-table-cell{
+  font-size: 8pt;    
+  padding: 3px;
+}
+
+.clean-link {
+  text-decoration: none;
+  font-size: 8pt;
+}
+.clean-link:hover {
+  color: #FFA175;
+}
+
+.footer{
+	text-align:center;
+	font-weight: bold;
+  	font-size: 8pt;
+}
+
+.info{
+  color: darkgreen;	
+}
+
+.warning{
+  color: #D1601A;	
+}
+
+.error{
+  color: darkred;	
+}
+
+
+
+.case-subject{
+  font-weight: bold;
+  color: #CC0F0F;
+}
+.healthy-subject{
+  font-weight: bold;
+  color: #1D9B34;
+}
+.control-subject{
+  font-weight: bold;
+  color: #444444;
+}
+
+.case-subject-external{
+  font-style:italic;
+  color: #CC6D6D;
+}
+.healthy-subject-external{
+  font-style:italic;
+  color: #6E9B72;
+}
+.control-subject-external{
+  font-style:italic;
+  color: #AAAAAA;
+}
+
+.missing-value-genotype{
+  color: #D1601A;
+}
+.normal-genotype{
+	
+}
+
+.missing-value-genotype-external{
+  font-style:italic;
+  color: #D1865E;
+}
+.normal-genotype-external{
+  font-style:italic;
+  color: #888888;
+}
+			
+.external-separator{  
+  width: 10px;  
+}
+
+.benign-variant{
+  font-style: italic;
+  color: #AAA;
+}
+
+.haplotype-table-header {
+  
+}
+
+.haplotype-table-header {  
+  font-weight: bold;
+  font-size: 7pt;
+  padding: 2px;
+  border-width: 0px 0px 2px 0px;
+  border-style: solid;
+  border-color: #55f;
+  text-align: center;
+}
+
+.haplotype-variant-cell {
+  font-weight: bold;
+  font-size: 7pt;
+  color: #333;
+  padding: 2px;
+  border-width: 0px 2px 1px 0px;
+  border-style: solid;
+  border-color: #55f;
+}
+
+.haplotype-table-cell {
+  font-size: 7pt;  
+  border-width: 0px 1px 1px 0px;
+  border-style: solid solid solid solid;
+  border-color: #aaa;
+  padding: 2px;
+  text-align: center;
+}
+
+a:link{ 
+	text-decoration: none;
+/*	color: #7d8abe;*/
+	color: #333;
+}
+	
+a:visited{ 
+	text-decoration: none;
+	color: #333;;
+}
+
+a:hover{ text-decoration: none;
+	color:#333;
+	font-weight: bolder;
+	text-decoration: underline;
+}

@@ -1,0 +1,8 @@
+Library.PyROOT@@TPyException:               libPyROOT.so
+Library.PyROOT@@TPyROOTApplication:         libPyROOT.so
+Library.TPyDispatcher:                      libPyROOT.so
+Library.TPyMultiGenFunction:                libPyROOT.so
+Library.TPyMultiGradFunction:               libPyROOT.so
+Library.TPyReturn:                          libPyROOT.so
+Library.TPySelector:                        libPyROOT.so
+Library.TPython:                            libPyROOT.so

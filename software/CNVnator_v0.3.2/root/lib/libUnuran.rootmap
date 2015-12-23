@@ -1,0 +1,7 @@
+Library.TUnuran:                            libUnuran.so libHist.so libMathCore.so
+Library.TUnuranBaseDist:                    libUnuran.so libHist.so libMathCore.so
+Library.TUnuranContDist:                    libUnuran.so libHist.so libMathCore.so
+Library.TUnuranDiscrDist:                   libUnuran.so libHist.so libMathCore.so
+Library.TUnuranEmpDist:                     libUnuran.so libHist.so libMathCore.so
+Library.TUnuranMultiContDist:               libUnuran.so libHist.so libMathCore.so
+Library.TUnuranSampler:                     libUnuran.so libHist.so libMathCore.so

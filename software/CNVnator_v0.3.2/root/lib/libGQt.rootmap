@@ -1,0 +1,11 @@
+Library.TGQt:                               libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQMimeTypes:                        libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtApplication:                     libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtBrush:                           libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtClientFilter:                    libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtClientWidget:                    libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtMarker:                          libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtPadFont:                         libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtRootSlot:                        libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtTimer:                           libGQt.so libGui.so libGpad.so libGraf.so libRint.so
+Library.TQtWidget:                          libGQt.so libGui.so libGpad.so libGraf.so libRint.so

@@ -1,0 +1,5 @@
+Library.TImageDump:                         libPostscript.so libGraf.so
+Library.TPDF:                               libPostscript.so libGraf.so
+Library.TPostScript:                        libPostscript.so libGraf.so
+Library.TSVG:                               libPostscript.so libGraf.so
+Library.TTeXDump:                           libPostscript.so libGraf.so

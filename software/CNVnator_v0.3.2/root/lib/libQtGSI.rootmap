@@ -1,0 +1,7 @@
+Library.TQApplication:                      libQtGSI.so libGui.so libGpad.so
+Library.TQCanvasImp:                        libQtGSI.so libGui.so libGpad.so
+Library.TQCanvasMenu:                       libQtGSI.so libGui.so libGpad.so
+Library.TQRootApplication:                  libQtGSI.so libGui.so libGpad.so
+Library.TQRootCanvas:                       libQtGSI.so libGui.so libGpad.so
+Library.TQRootDialog:                       libQtGSI.so libGui.so libGpad.so
+Library.TQRootGuiFactory:                   libQtGSI.so libGui.so libGpad.so

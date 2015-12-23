@@ -1,0 +1,4 @@
+Library.TBonjourBrowser:                    libBonjour.so
+Library.TBonjourRecord:                     libBonjour.so
+Library.TBonjourRegistrar:                  libBonjour.so
+Library.TBonjourResolver:                   libBonjour.so

@@ -1,0 +1,3 @@
+Library.TNetXNGFile:                        libNetxNG.so libNet.so libRIO.so libThread.so
+Library.TNetXNGFileStager:                  libNetxNG.so libNet.so libRIO.so libThread.so
+Library.TNetXNGSystem:                      libNetxNG.so libNet.so libRIO.so libThread.so

@@ -1,0 +1,11 @@
+Library.TBufferJSON:                        libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TCivetweb:                          libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TFastCgi:                           libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.THttpCallArg:                       libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.THttpEngine:                        libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.THttpServer:                        libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TRootSniffer:                       libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TRootSnifferScanRec:                libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TRootSnifferStore:                  libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TRootSnifferStoreJson:              libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
+Library.TRootSnifferStoreXml:               libRHTTP.so libThread.so libTree.so libHist.so libGpad.so libGraf.so libRIO.so libXMLIO.so
