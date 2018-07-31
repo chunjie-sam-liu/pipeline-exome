@@ -1,5 +1,4 @@
 #Whole exome pipeline
-##Oh,You are smart if read READ.md first.
 The whole pipeline structure was upload to our bbs, you can search wes on bbs to find detailed specification and manual.
 Or you may visit my WP, search chunjie-sam-liu on wordpress or on github.
 Or run command ./test.sh to get intuitive result.
